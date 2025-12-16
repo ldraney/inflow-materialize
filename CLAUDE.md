@@ -65,17 +65,17 @@ Full granularity for power users, compliance, and warehouse operations.
 | `lot_inventory` | Lot-level tracking with product shelfLifeDays for expiry estimation | ✅ Done |
 | `serial_inventory` | Serial number tracking with current location | ✅ Done |
 
-### Phase 4: Business Analytics 🔲 TODO
+### Phase 4: Business Analytics ✅ COMPLETE
 
 Views for business intelligence and reporting.
 
 | View | Purpose | Status |
 |------|---------|--------|
-| `customer_360` | Customer + total revenue + order count + open orders | 🔲 |
-| `vendor_scorecard` | Vendor + products supplied + PO history summary | 🔲 |
-| `product_margin` | Product price vs vendor cost = margin | 🔲 |
-| `bom_costed` | Bill of materials with component costs rolled up | 🔲 |
-| `category_inventory_summary` | Stock value/count aggregated by category | 🔲 |
+| `customer_360` | Customer + total revenue + order count + open orders | ✅ Done |
+| `vendor_scorecard` | Vendor + products supplied + PO history summary | ✅ Done |
+| `product_margin` | Product price vs vendor cost = margin | ✅ Done |
+| `bom_costed` | Bill of materials with component costs rolled up | ✅ Done |
+| `category_inventory_summary` | Stock value/count aggregated by category | ✅ Done |
 
 ### Phase 5: Time-Series / History 🔲 FUTURE
 
@@ -177,6 +177,11 @@ src/
     ├── stock-movement-ledger.ts       # ✅ Phase 3
     ├── lot-inventory.ts               # ✅ Phase 3
     ├── serial-inventory.ts            # ✅ Phase 3
+    ├── customer-360.ts                # ✅ Phase 4
+    ├── vendor-scorecard.ts            # ✅ Phase 4
+    ├── product-margin.ts              # ✅ Phase 4
+    ├── bom-costed.ts                  # ✅ Phase 4
+    ├── category-inventory-summary.ts  # ✅ Phase 4
     └── ...
 ```
 
