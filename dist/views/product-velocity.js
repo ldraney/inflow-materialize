@@ -87,7 +87,7 @@ export const productVelocity = sqliteView('product_velocity').as((qb) => {
         MAX(so.order_date) AS last_sale_date
       FROM sales_order_lines sol
       INNER JOIN sales_orders so ON sol.sales_order_id = so.sales_order_id
-      WHERE so.status IN ('Completed', 'Shipped', 'Closed')
+      WHERE LOWER(so.status) IN ('completed', 'shipped', 'closed', 'fulfilled')
         AND julianday('now') - julianday(so.order_date) <= 90
       GROUP BY sol.product_id
     ) sales ON p.product_id = sales.product_id
@@ -153,7 +153,7 @@ LEFT JOIN (
     MAX(so.order_date) AS last_sale_date
   FROM sales_order_lines sol
   INNER JOIN sales_orders so ON sol.sales_order_id = so.sales_order_id
-  WHERE so.status IN ('Completed', 'Shipped', 'Closed')
+  WHERE LOWER(so.status) IN ('completed', 'shipped', 'closed', 'fulfilled')
     AND julianday('now') - julianday(so.order_date) <= 90
   GROUP BY sol.product_id
 ) sales ON p.product_id = sales.product_id

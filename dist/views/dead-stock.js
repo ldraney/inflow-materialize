@@ -58,7 +58,7 @@ export const deadStock = sqliteView('dead_stock').as((qb) => {
         ELSE NULL
       END AS dead_stock_tier
     FROM (
-      -- Current inventory by product/location
+      -- Current inventory by product/location with vendor cost
       SELECT
         ps.product_id,
         p.sku,
@@ -68,11 +68,16 @@ export const deadStock = sqliteView('dead_stock').as((qb) => {
         ps.location_id,
         l.name AS location_name,
         ps.quantity_on_hand,
-        p.cost AS unit_cost
+        vi.cost AS unit_cost
       FROM product_summary ps
       INNER JOIN products p ON ps.product_id = p.product_id
       LEFT JOIN categories c ON p.category_id = c.category_id
       LEFT JOIN locations l ON ps.location_id = l.location_id
+      LEFT JOIN (
+        SELECT product_id, cost,
+          ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY CAST(cost AS REAL) ASC) AS rn
+        FROM vendor_items
+      ) vi ON p.product_id = vi.product_id AND vi.rn = 1
       WHERE ps.location_id IS NOT NULL
         AND CAST(COALESCE(ps.quantity_on_hand, '0') AS REAL) > 0
     ) inv
@@ -90,7 +95,7 @@ export const deadStock = sqliteView('dead_stock').as((qb) => {
           po.order_date AS movement_date
         FROM purchase_order_lines pol
         INNER JOIN purchase_orders po ON pol.purchase_order_id = po.purchase_order_id
-        WHERE po.status IN ('Completed', 'Closed')
+        WHERE LOWER(po.status) IN ('completed', 'closed', 'fulfilled')
           AND CAST(COALESCE(pol.quantity_received, '0') AS REAL) > 0
 
         UNION ALL
@@ -102,7 +107,7 @@ export const deadStock = sqliteView('dead_stock').as((qb) => {
           so.order_date AS movement_date
         FROM sales_order_lines sol
         INNER JOIN sales_orders so ON sol.sales_order_id = so.sales_order_id
-        WHERE so.status IN ('Completed', 'Shipped', 'Closed')
+        WHERE LOWER(so.status) IN ('completed', 'shipped', 'closed', 'fulfilled')
           AND CAST(COALESCE(sol.quantity_shipped, '0') AS REAL) > 0
 
         UNION ALL
@@ -114,7 +119,7 @@ export const deadStock = sqliteView('dead_stock').as((qb) => {
           st.transfer_date AS movement_date
         FROM stock_transfer_lines stl
         INNER JOIN stock_transfers st ON stl.stock_transfer_id = st.stock_transfer_id
-        WHERE st.status IN ('Completed', 'Closed')
+        WHERE LOWER(st.status) IN ('completed', 'closed')
 
         UNION ALL
 
@@ -125,7 +130,7 @@ export const deadStock = sqliteView('dead_stock').as((qb) => {
           st.transfer_date AS movement_date
         FROM stock_transfer_lines stl
         INNER JOIN stock_transfers st ON stl.stock_transfer_id = st.stock_transfer_id
-        WHERE st.status IN ('Completed', 'Closed')
+        WHERE LOWER(st.status) IN ('completed', 'closed')
 
         UNION ALL
 
@@ -172,7 +177,7 @@ SELECT
     ELSE NULL
   END AS dead_stock_tier
 FROM (
-  -- Current inventory by product/location
+  -- Current inventory by product/location with vendor cost
   SELECT
     ps.product_id,
     p.sku,
@@ -182,11 +187,16 @@ FROM (
     ps.location_id,
     l.name AS location_name,
     ps.quantity_on_hand,
-    p.cost AS unit_cost
+    vi.cost AS unit_cost
   FROM product_summary ps
   INNER JOIN products p ON ps.product_id = p.product_id
   LEFT JOIN categories c ON p.category_id = c.category_id
   LEFT JOIN locations l ON ps.location_id = l.location_id
+  LEFT JOIN (
+    SELECT product_id, cost,
+      ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY CAST(cost AS REAL) ASC) AS rn
+    FROM vendor_items
+  ) vi ON p.product_id = vi.product_id AND vi.rn = 1
   WHERE ps.location_id IS NOT NULL
     AND CAST(COALESCE(ps.quantity_on_hand, '0') AS REAL) > 0
 ) inv
@@ -204,7 +214,7 @@ LEFT JOIN (
       po.order_date AS movement_date
     FROM purchase_order_lines pol
     INNER JOIN purchase_orders po ON pol.purchase_order_id = po.purchase_order_id
-    WHERE po.status IN ('Completed', 'Closed')
+    WHERE LOWER(po.status) IN ('completed', 'closed', 'fulfilled')
       AND CAST(COALESCE(pol.quantity_received, '0') AS REAL) > 0
 
     UNION ALL
@@ -216,7 +226,7 @@ LEFT JOIN (
       so.order_date AS movement_date
     FROM sales_order_lines sol
     INNER JOIN sales_orders so ON sol.sales_order_id = so.sales_order_id
-    WHERE so.status IN ('Completed', 'Shipped', 'Closed')
+    WHERE LOWER(so.status) IN ('completed', 'shipped', 'closed', 'fulfilled')
       AND CAST(COALESCE(sol.quantity_shipped, '0') AS REAL) > 0
 
     UNION ALL
@@ -228,7 +238,7 @@ LEFT JOIN (
       st.transfer_date AS movement_date
     FROM stock_transfer_lines stl
     INNER JOIN stock_transfers st ON stl.stock_transfer_id = st.stock_transfer_id
-    WHERE st.status IN ('Completed', 'Closed')
+    WHERE LOWER(st.status) IN ('completed', 'closed')
 
     UNION ALL
 
@@ -239,7 +249,7 @@ LEFT JOIN (
       st.transfer_date AS movement_date
     FROM stock_transfer_lines stl
     INNER JOIN stock_transfers st ON stl.stock_transfer_id = st.stock_transfer_id
-    WHERE st.status IN ('Completed', 'Closed')
+    WHERE LOWER(st.status) IN ('completed', 'closed')
 
     UNION ALL
 

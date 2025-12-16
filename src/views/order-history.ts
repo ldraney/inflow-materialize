@@ -61,7 +61,7 @@ export const orderHistory = sqliteView('order_history').as((qb) => {
     INNER JOIN products p ON pol.product_id = p.product_id
     LEFT JOIN vendors v ON po.vendor_id = v.vendor_id
     LEFT JOIN locations l ON po.location_id = l.location_id
-    WHERE po.status IN ('Completed', 'Closed')
+    WHERE LOWER(po.status) IN ('completed', 'closed', 'fulfilled')
 
     UNION ALL
 
@@ -89,7 +89,7 @@ export const orderHistory = sqliteView('order_history').as((qb) => {
     INNER JOIN products p ON sol.product_id = p.product_id
     LEFT JOIN customers c ON so.customer_id = c.customer_id
     LEFT JOIN locations l ON so.location_id = l.location_id
-    WHERE so.status IN ('Completed', 'Shipped', 'Closed')
+    WHERE LOWER(so.status) IN ('completed', 'shipped', 'closed', 'fulfilled')
 
     UNION ALL
 
@@ -110,12 +110,12 @@ export const orderHistory = sqliteView('order_history').as((qb) => {
       p.name AS product_name,
       mo.quantity AS quantity_ordered,
       mo.quantity_completed AS quantity_fulfilled,
-      p.cost AS unit_price,
-      CAST(CAST(COALESCE(mo.quantity_completed, '0') AS REAL) * CAST(COALESCE(p.cost, '0') AS REAL) AS TEXT) AS line_total
+      NULL AS unit_price,
+      NULL AS line_total
     FROM manufacturing_orders mo
     INNER JOIN products p ON mo.product_id = p.product_id
     LEFT JOIN locations l ON mo.location_id = l.location_id
-    WHERE mo.status IN ('Completed', 'Closed')
+    WHERE LOWER(mo.status) IN ('completed', 'closed')
   )`);
 });
 
@@ -149,7 +149,7 @@ INNER JOIN purchase_order_lines pol ON po.purchase_order_id = pol.purchase_order
 INNER JOIN products p ON pol.product_id = p.product_id
 LEFT JOIN vendors v ON po.vendor_id = v.vendor_id
 LEFT JOIN locations l ON po.location_id = l.location_id
-WHERE po.status IN ('Completed', 'Closed')
+WHERE LOWER(po.status) IN ('completed', 'closed', 'fulfilled')
 
 UNION ALL
 
@@ -177,7 +177,7 @@ INNER JOIN sales_order_lines sol ON so.sales_order_id = sol.sales_order_id
 INNER JOIN products p ON sol.product_id = p.product_id
 LEFT JOIN customers c ON so.customer_id = c.customer_id
 LEFT JOIN locations l ON so.location_id = l.location_id
-WHERE so.status IN ('Completed', 'Shipped', 'Closed')
+WHERE LOWER(so.status) IN ('completed', 'shipped', 'closed', 'fulfilled')
 
 UNION ALL
 
@@ -198,10 +198,10 @@ SELECT
   p.name AS product_name,
   mo.quantity AS quantity_ordered,
   mo.quantity_completed AS quantity_fulfilled,
-  p.cost AS unit_price,
-  CAST(CAST(COALESCE(mo.quantity_completed, '0') AS REAL) * CAST(COALESCE(p.cost, '0') AS REAL) AS TEXT) AS line_total
+  NULL AS unit_price,
+  NULL AS line_total
 FROM manufacturing_orders mo
 INNER JOIN products p ON mo.product_id = p.product_id
 LEFT JOIN locations l ON mo.location_id = l.location_id
-WHERE mo.status IN ('Completed', 'Closed');
+WHERE LOWER(mo.status) IN ('completed', 'closed');
 `;
