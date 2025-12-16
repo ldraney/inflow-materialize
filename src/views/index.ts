@@ -56,6 +56,32 @@ export {
   serialInventorySQL,
 } from './serial-inventory.js';
 
+// Phase 4: Business Analytics
+export {
+  customer360,
+  customer360SQL,
+} from './customer-360.js';
+
+export {
+  vendorScorecard,
+  vendorScorecardSQL,
+} from './vendor-scorecard.js';
+
+export {
+  productMargin,
+  productMarginSQL,
+} from './product-margin.js';
+
+export {
+  bomCosted,
+  bomCostedSQL,
+} from './bom-costed.js';
+
+export {
+  categoryInventorySummary,
+  categoryInventorySummarySQL,
+} from './category-inventory-summary.js';
+
 /**
  * All view SQL statements for creating views directly
  */

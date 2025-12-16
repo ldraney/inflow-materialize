@@ -12,6 +12,12 @@ import { inventoryDetailSQL } from './views/inventory-detail.js';
 import { stockMovementLedgerSQL } from './views/stock-movement-ledger.js';
 import { lotInventorySQL } from './views/lot-inventory.js';
 import { serialInventorySQL } from './views/serial-inventory.js';
+// Phase 4: Business Analytics
+import { customer360SQL } from './views/customer-360.js';
+import { vendorScorecardSQL } from './views/vendor-scorecard.js';
+import { productMarginSQL } from './views/product-margin.js';
+import { bomCostedSQL } from './views/bom-costed.js';
+import { categoryInventorySummarySQL } from './views/category-inventory-summary.js';
 /**
  * All view SQL statements
  */
@@ -30,6 +36,12 @@ export const allViewsSQL = [
     stockMovementLedgerSQL,
     lotInventorySQL,
     serialInventorySQL,
+    // Phase 4: Business Analytics
+    customer360SQL,
+    vendorScorecardSQL,
+    productMarginSQL,
+    bomCostedSQL,
+    categoryInventorySummarySQL,
 ];
 /**
  * View names for dropping/recreating
@@ -49,6 +61,12 @@ export const viewNames = [
     'stock_movement_ledger',
     'lot_inventory',
     'serial_inventory',
+    // Phase 4: Business Analytics
+    'customer_360',
+    'vendor_scorecard',
+    'product_margin',
+    'bom_costed',
+    'category_inventory_summary',
 ];
 /**
  * Create all materialized views in the database
@@ -101,6 +119,17 @@ function getViewSQL(viewName) {
             return lotInventorySQL;
         case 'serial_inventory':
             return serialInventorySQL;
+        // Phase 4: Business Analytics
+        case 'customer_360':
+            return customer360SQL;
+        case 'vendor_scorecard':
+            return vendorScorecardSQL;
+        case 'product_margin':
+            return productMarginSQL;
+        case 'bom_costed':
+            return bomCostedSQL;
+        case 'category_inventory_summary':
+            return categoryInventorySummarySQL;
     }
 }
 /**
