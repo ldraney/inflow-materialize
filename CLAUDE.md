@@ -87,6 +87,32 @@ Views that require historical data or time-based analysis.
 | `product_velocity` | Sales/consumption rate per product | ✅ Done |
 | `dead_stock` | Products with no movement in N days | ✅ Done |
 
+### Phase 6: Drizzle Schemas ⬜ TODO
+
+Type-safe schemas for downstream consumption. Enables typed queries in consuming apps.
+
+| Task | Purpose | Status |
+|------|---------|--------|
+| Add `drizzle-orm` dependency | Required for schema definitions | ⬜ |
+| Create `src/schemas/` directory | Mirror view structure | ⬜ |
+| Schema for each view (18 total) | Type-safe table definitions | ⬜ |
+| Export schemas from package | `inflow-materialize/schemas` | ⬜ |
+| Update package.json exports | Subpath exports for schemas | ⬜ |
+
+#### Downstream Usage (Goal)
+
+```typescript
+import { createViews } from 'inflow-materialize';
+import { reorderAlerts, productVelocity } from 'inflow-materialize/schemas';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+
+const db = drizzle(sqlite);
+
+// Fully typed queries
+const alerts = db.select().from(reorderAlerts).all();
+//    ^? { productId: string, sku: string | null, ... }[]
+```
+
 #### View Specifications
 
 **`order_history`** - Unified completed orders with line-level detail
@@ -225,27 +251,30 @@ npm publish
 src/
 ├── index.ts              # Main exports
 ├── create-views.ts       # createViews() and dropViews() utilities
-└── views/
-    ├── index.ts          # View re-exports
-    ├── product-inventory-status.ts    # ✅ Phase 1
-    ├── reorder-alerts.ts              # ✅ Phase 1
-    ├── open-orders-unified.ts         # ✅ Phase 1
-    ├── inventory-by-location.ts       # ✅ Phase 2
-    ├── location-stock-summary.ts      # ✅ Phase 2
-    ├── location-reorder-alerts.ts     # ✅ Phase 2
-    ├── transfer-pipeline.ts           # ✅ Phase 2
-    ├── inventory-detail.ts            # ✅ Phase 3
-    ├── stock-movement-ledger.ts       # ✅ Phase 3
-    ├── lot-inventory.ts               # ✅ Phase 3
-    ├── serial-inventory.ts            # ✅ Phase 3
-    ├── customer-360.ts                # ✅ Phase 4
-    ├── vendor-scorecard.ts            # ✅ Phase 4
-    ├── product-margin.ts              # ✅ Phase 4
-    ├── bom-costed.ts                  # ✅ Phase 4
-    ├── category-inventory-summary.ts  # ✅ Phase 4
-    ├── order-history.ts               # ✅ Phase 5
-    ├── product-velocity.ts            # ✅ Phase 5
-    └── dead-stock.ts                  # ✅ Phase 5
+├── views/                # SQL view definitions
+│   ├── index.ts
+│   ├── product-inventory-status.ts    # Phase 1
+│   ├── reorder-alerts.ts              # Phase 1
+│   ├── open-orders-unified.ts         # Phase 1
+│   ├── inventory-by-location.ts       # Phase 2
+│   ├── location-stock-summary.ts      # Phase 2
+│   ├── location-reorder-alerts.ts     # Phase 2
+│   ├── transfer-pipeline.ts           # Phase 2
+│   ├── inventory-detail.ts            # Phase 3
+│   ├── stock-movement-ledger.ts       # Phase 3
+│   ├── lot-inventory.ts               # Phase 3
+│   ├── serial-inventory.ts            # Phase 3
+│   ├── customer-360.ts                # Phase 4
+│   ├── vendor-scorecard.ts            # Phase 4
+│   ├── product-margin.ts              # Phase 4
+│   ├── bom-costed.ts                  # Phase 4
+│   ├── category-inventory-summary.ts  # Phase 4
+│   ├── order-history.ts               # Phase 5
+│   ├── product-velocity.ts            # Phase 5
+│   └── dead-stock.ts                  # Phase 5
+└── schemas/              # ⬜ Phase 6: Drizzle schemas (TODO)
+    ├── index.ts
+    └── ... (mirrors views/)
 ```
 
 ## Related Packages
