@@ -1,7 +1,7 @@
 {
   "name": "inflow-materialize",
   "version": "0.2.0",
-  "description": "Business-friendly materialized views for Inflow Inventory data",
+  "description": "Type-safe materialized views for Inflow Inventory with Drizzle schemas",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

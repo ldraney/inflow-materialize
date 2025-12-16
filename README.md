@@ -1,77 +1,99 @@
 # inflow-materialize
 
-Business-friendly materialized views for Inflow Inventory data. Use with [inflow-get](https://npm.im/inflow-get) to create useful views for frontend consumption.
+Business-friendly materialized views for Inflow Inventory data with type-safe Drizzle schemas.
+
+Use with [inflow-get](https://npm.im/inflow-get) to create useful views for frontend consumption.
 
 ## Installation
 
 ```bash
-npm install inflow-materialize inflow-get
+npm install inflow-materialize inflow-get drizzle-orm
 ```
 
 ## Usage
+
+### Basic Usage (Raw SQL)
 
 ```typescript
 import { getDb } from 'inflow-get';
 import { createViews } from 'inflow-materialize';
 
-// Get your seeded database from inflow-get
 const db = getDb('./inflow.db');
-
-// Create all materialized views
 createViews(db);
 
-// Query the views
+// Query views with raw SQL
 const lowStock = db.prepare('SELECT * FROM reorder_alerts').all();
-const pipeline = db.prepare('SELECT * FROM open_orders_unified ORDER BY expected_date').all();
-const products = db.prepare('SELECT * FROM product_inventory_status WHERE is_active = 1').all();
+```
+
+### Type-Safe Queries (Drizzle)
+
+```typescript
+import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { createViews } from 'inflow-materialize';
+import { reorderAlerts, productVelocity } from 'inflow-materialize/schemas';
+
+const sqlite = new Database('./inflow.db');
+createViews(sqlite);
+
+const db = drizzle(sqlite);
+
+// Fully typed queries!
+const alerts = db.select().from(reorderAlerts).all();
+//    ^? { productId: string, sku: string | null, ... }[]
+
+const fastMovers = db
+  .select()
+  .from(productVelocity)
+  .where(eq(productVelocity.velocityTier, 'FAST'))
+  .all();
 ```
 
 ## Views
 
-### `product_inventory_status`
+### Dashboard Layer (Company-Wide)
 
-The "product card" view - everything you need to display a product's current inventory position.
+| View | Purpose |
+|------|---------|
+| `product_inventory_status` | Product card with global inventory + reorder flag |
+| `reorder_alerts` | Products below reorder point with vendor + cost |
+| `open_orders_unified` | PO + SO + MO pipeline (all open work) |
 
-| Column | Description |
-|--------|-------------|
-| `product_id`, `sku`, `name` | Product identifiers |
-| `category_name` | Resolved category name |
-| `quantity_on_hand` | Physical stock |
-| `quantity_available` | Sellable stock (on hand - reserved) |
-| `quantity_on_purchase_order` | Incoming from vendors |
-| `reorder_point`, `reorder_quantity` | Reorder settings |
-| `is_below_reorder` | 1 if needs reordering, 0 otherwise |
-| `preferred_vendor_id` | Default vendor for reordering |
+### Operational Layer (Location-Aware)
 
-### `reorder_alerts`
+| View | Purpose |
+|------|---------|
+| `inventory_by_location` | Product summary broken out by location |
+| `location_stock_summary` | Aggregate stock value/count per location |
+| `location_reorder_alerts` | Per-location reorder points |
+| `transfer_pipeline` | Open transfers between locations |
 
-Products that need to be reordered - filtered to only items below reorder point.
+### Expert Layer (Full Granularity)
 
-| Column | Description |
-|--------|-------------|
-| `product_id`, `sku`, `product_name` | Product identifiers |
-| `quantity_available` | Current sellable stock |
-| `reorder_point` | Threshold that triggered alert |
-| `shortfall_quantity` | How much below reorder point |
-| `suggested_order_quantity` | Recommended order qty |
-| `vendor_name`, `vendor_cost` | Preferred vendor info |
-| `lead_time_days` | Expected delivery time |
-| `estimated_order_value` | Cost estimate for PO |
+| View | Purpose |
+|------|---------|
+| `inventory_detail` | Inventory lines with sublocation, serial, lot |
+| `stock_movement_ledger` | UNION of all stock movements |
+| `lot_inventory` | Lot-level tracking with expiry estimation |
+| `serial_inventory` | Serial number tracking with current location |
 
-### `open_orders_unified`
+### Business Analytics
 
-Single pipeline view of all open work - POs, SOs, and Manufacturing Orders unified.
+| View | Purpose |
+|------|---------|
+| `customer_360` | Customer + revenue + order count + open orders |
+| `vendor_scorecard` | Vendor + products supplied + PO history |
+| `product_margin` | Product price vs vendor cost = margin |
+| `bom_costed` | Bill of materials with component costs rolled up |
+| `category_inventory_summary` | Stock value/count by category |
 
-| Column | Description |
-|--------|-------------|
-| `order_id`, `order_number` | Order identifiers |
-| `order_type` | `purchase_order`, `sales_order`, or `manufacturing_order` |
-| `status` | Current order status |
-| `order_date`, `expected_date` | Timeline |
-| `counterparty_name` | Vendor/Customer/Product name |
-| `counterparty_type` | `vendor`, `customer`, or `product` |
-| `location_name` | Destination/source location |
-| `total` | Order value (or quantity for MOs) |
+### Time-Series / History
+
+| View | Purpose |
+|------|---------|
+| `order_history` | All completed orders with line details |
+| `product_velocity` | Sales rate with 7/30/90 day windows |
+| `dead_stock` | Products with no movement in 30+ days |
 
 ## API
 
@@ -82,10 +104,10 @@ Create all views in the database.
 ```typescript
 createViews(db);
 
-// Or with options
+// With options
 createViews(db, {
   dropExisting: true,  // Drop and recreate (default: true)
-  only: ['reorder_alerts'],  // Only specific views
+  only: ['reorder_alerts', 'product_velocity'],  // Only specific views
 });
 ```
 
@@ -98,16 +120,35 @@ dropViews(db);  // Drop all
 dropViews(db, ['reorder_alerts']);  // Drop specific
 ```
 
-### Raw SQL
+### Raw SQL Exports
 
 Each view exports its SQL for direct use:
 
 ```typescript
-import { productInventoryStatusSQL, reorderAlertsSQL, openOrdersUnifiedSQL } from 'inflow-materialize';
+import { reorderAlertsSQL, productVelocitySQL } from 'inflow-materialize';
 
-// Execute directly
-db.exec(productInventoryStatusSQL);
+db.exec(reorderAlertsSQL);
 ```
+
+### Drizzle Schemas
+
+Import from `/schemas` for type-safe queries:
+
+```typescript
+import {
+  productInventoryStatus,
+  reorderAlerts,
+  productVelocity,
+  deadStock,
+  // ... all 18 views
+} from 'inflow-materialize/schemas';
+```
+
+## Related Packages
+
+- [inflow-get](https://npm.im/inflow-get) - Seeds SQLite from Inflow API
+- [inflow-client](https://npm.im/inflow-client) - API client with auth/rate limiting
+- [inflow-api-types](https://npm.im/inflow-api-types) - Zod schemas for API responses
 
 ## License
 
