@@ -35,6 +35,27 @@ export {
   transferPipelineSQL,
 } from './transfer-pipeline.js';
 
+// Phase 3: Expert Layer
+export {
+  inventoryDetail,
+  inventoryDetailSQL,
+} from './inventory-detail.js';
+
+export {
+  stockMovementLedger,
+  stockMovementLedgerSQL,
+} from './stock-movement-ledger.js';
+
+export {
+  lotInventory,
+  lotInventorySQL,
+} from './lot-inventory.js';
+
+export {
+  serialInventory,
+  serialInventorySQL,
+} from './serial-inventory.js';
+
 /**
  * All view SQL statements for creating views directly
  */

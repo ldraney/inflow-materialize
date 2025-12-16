@@ -8,6 +8,11 @@ import { inventoryByLocationSQL } from './views/inventory-by-location.js';
 import { locationStockSummarySQL } from './views/location-stock-summary.js';
 import { locationReorderAlertsSQL } from './views/location-reorder-alerts.js';
 import { transferPipelineSQL } from './views/transfer-pipeline.js';
+// Phase 3: Expert Layer
+import { inventoryDetailSQL } from './views/inventory-detail.js';
+import { stockMovementLedgerSQL } from './views/stock-movement-ledger.js';
+import { lotInventorySQL } from './views/lot-inventory.js';
+import { serialInventorySQL } from './views/serial-inventory.js';
 
 /**
  * All view SQL statements
@@ -22,6 +27,11 @@ export const allViewsSQL = [
   locationStockSummarySQL,
   locationReorderAlertsSQL,
   transferPipelineSQL,
+  // Phase 3: Expert Layer
+  inventoryDetailSQL,
+  stockMovementLedgerSQL,
+  lotInventorySQL,
+  serialInventorySQL,
 ] as const;
 
 /**
@@ -37,6 +47,11 @@ export const viewNames = [
   'location_stock_summary',
   'location_reorder_alerts',
   'transfer_pipeline',
+  // Phase 3: Expert Layer
+  'inventory_detail',
+  'stock_movement_ledger',
+  'lot_inventory',
+  'serial_inventory',
 ] as const;
 
 export type ViewName = (typeof viewNames)[number];
@@ -95,6 +110,15 @@ function getViewSQL(viewName: ViewName): string {
       return locationReorderAlertsSQL;
     case 'transfer_pipeline':
       return transferPipelineSQL;
+    // Phase 3: Expert Layer
+    case 'inventory_detail':
+      return inventoryDetailSQL;
+    case 'stock_movement_ledger':
+      return stockMovementLedgerSQL;
+    case 'lot_inventory':
+      return lotInventorySQL;
+    case 'serial_inventory':
+      return serialInventorySQL;
   }
 }
 

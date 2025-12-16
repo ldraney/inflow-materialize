@@ -5,6 +5,10 @@ export { inventoryByLocation, inventoryByLocationSQL, } from './inventory-by-loc
 export { locationStockSummary, locationStockSummarySQL, } from './location-stock-summary.js';
 export { locationReorderAlerts, locationReorderAlertsSQL, } from './location-reorder-alerts.js';
 export { transferPipeline, transferPipelineSQL, } from './transfer-pipeline.js';
+export { inventoryDetail, inventoryDetailSQL, } from './inventory-detail.js';
+export { stockMovementLedger, stockMovementLedgerSQL, } from './stock-movement-ledger.js';
+export { lotInventory, lotInventorySQL, } from './lot-inventory.js';
+export { serialInventory, serialInventorySQL, } from './serial-inventory.js';
 /**
  * All view SQL statements for creating views directly
  */
