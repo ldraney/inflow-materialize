@@ -19,5 +19,8 @@
  */
 export { createViews, dropViews, allViewsSQL, viewNames, } from './create-views.js';
 // Re-export individual views for Drizzle users
-export { productInventoryStatus, productInventoryStatusSQL, reorderAlerts, reorderAlertsSQL, openOrdersUnified, openOrdersUnifiedSQL, } from './views/index.js';
+// Phase 1: Dashboard Layer
+export { productInventoryStatus, productInventoryStatusSQL, reorderAlerts, reorderAlertsSQL, openOrdersUnified, openOrdersUnifiedSQL, 
+// Phase 2: Operational Layer
+inventoryByLocation, inventoryByLocationSQL, locationStockSummary, locationStockSummarySQL, locationReorderAlerts, locationReorderAlertsSQL, transferPipeline, transferPipelineSQL, } from './views/index.js';
 //# sourceMappingURL=index.js.map

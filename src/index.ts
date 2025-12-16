@@ -27,6 +27,7 @@ export {
 } from './create-views.js';
 
 // Re-export individual views for Drizzle users
+// Phase 1: Dashboard Layer
 export {
   productInventoryStatus,
   productInventoryStatusSQL,
@@ -34,4 +35,13 @@ export {
   reorderAlertsSQL,
   openOrdersUnified,
   openOrdersUnifiedSQL,
+  // Phase 2: Operational Layer
+  inventoryByLocation,
+  inventoryByLocationSQL,
+  locationStockSummary,
+  locationStockSummarySQL,
+  locationReorderAlerts,
+  locationReorderAlertsSQL,
+  transferPipeline,
+  transferPipelineSQL,
 } from './views/index.js';

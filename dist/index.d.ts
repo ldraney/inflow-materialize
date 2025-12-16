@@ -18,5 +18,5 @@
  * ```
  */
 export { createViews, dropViews, allViewsSQL, viewNames, type ViewName, } from './create-views.js';
-export { productInventoryStatus, productInventoryStatusSQL, reorderAlerts, reorderAlertsSQL, openOrdersUnified, openOrdersUnifiedSQL, } from './views/index.js';
+export { productInventoryStatus, productInventoryStatusSQL, reorderAlerts, reorderAlertsSQL, openOrdersUnified, openOrdersUnifiedSQL, inventoryByLocation, inventoryByLocationSQL, locationStockSummary, locationStockSummarySQL, locationReorderAlerts, locationReorderAlertsSQL, transferPipeline, transferPipelineSQL, } from './views/index.js';
 //# sourceMappingURL=index.d.ts.map
