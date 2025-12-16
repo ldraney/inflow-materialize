@@ -77,15 +77,76 @@ Views for business intelligence and reporting.
 | `bom_costed` | Bill of materials with component costs rolled up | ✅ Done |
 | `category_inventory_summary` | Stock value/count aggregated by category | ✅ Done |
 
-### Phase 5: Time-Series / History 🔲 FUTURE
+### Phase 5: Time-Series / History ✅ COMPLETE
 
 Views that require historical data or time-based analysis.
 
 | View | Purpose | Status |
 |------|---------|--------|
-| `order_history` | All orders (completed) with line details | 🔲 |
-| `product_velocity` | Sales/consumption rate per product | 🔲 |
-| `dead_stock` | Products with no movement in N days | 🔲 |
+| `order_history` | All orders (completed) with line details | ✅ Done |
+| `product_velocity` | Sales/consumption rate per product | ✅ Done |
+| `dead_stock` | Products with no movement in N days | ✅ Done |
+
+#### View Specifications
+
+**`order_history`** - Unified completed orders with line-level detail
+
+UNION of PO + SO + MO (all completed). Line-level granularity.
+
+| Field | Description |
+|-------|-------------|
+| `order_type` | 'PO', 'SO', or 'MO' |
+| `order_id`, `order_number` | Reference identifiers |
+| `order_date` | When order was placed |
+| `status` | Final status (Completed/Shipped/Closed) |
+| `partner_id`, `partner_name` | Vendor (PO) or Customer (SO), NULL for MO |
+| `location_id`, `location_name` | Fulfillment location |
+| `line_id` | Line identifier |
+| `product_id`, `sku`, `product_name` | Product info |
+| `quantity_ordered` | Original qty |
+| `quantity_fulfilled` | Received (PO), Shipped (SO), Completed (MO) |
+| `unit_price`, `line_total` | Cost (PO) or Revenue (SO) |
+
+---
+
+**`product_velocity`** - Rolling sales velocity with multiple time windows
+
+Aggregates from completed sales orders. Rolling 7/30/90 day windows.
+
+| Field | Description |
+|-------|-------------|
+| `product_id`, `sku`, `product_name` | Product info |
+| `category_name` | Product category |
+| `quantity_on_hand` | Current stock |
+| `sold_7d` | Units sold in last 7 days |
+| `sold_30d` | Units sold in last 30 days |
+| `sold_90d` | Units sold in last 90 days |
+| `avg_daily_sales` | `sold_30d / 30` |
+| `days_of_stock` | `quantity_on_hand / avg_daily_sales` (NULL if no sales) |
+| `last_sale_date` | Most recent completed sale |
+| `velocity_tier` | 'FAST' (>1/day), 'MEDIUM' (>0.1/day), 'SLOW' (else) |
+
+Uses `julianday()` for date arithmetic in SQLite.
+
+---
+
+**`dead_stock`** - Inventory with no movement, tiered by age
+
+Products with stock on hand but no movement in `stock_movement_ledger`.
+
+| Field | Description |
+|-------|-------------|
+| `product_id`, `sku`, `product_name` | Product info |
+| `category_name` | Product category |
+| `location_id`, `location_name` | Where stock is sitting |
+| `quantity_on_hand` | Current stock at location |
+| `unit_cost` | Product cost |
+| `total_value` | `quantity_on_hand * unit_cost` |
+| `last_movement_date` | Most recent IN or OUT |
+| `days_since_movement` | Days since last movement |
+| `dead_stock_tier` | '30+', '60+', '90+' days (NULL if recent movement) |
+
+Only includes products where `days_since_movement >= 30`.
 
 ---
 
@@ -182,7 +243,9 @@ src/
     ├── product-margin.ts              # ✅ Phase 4
     ├── bom-costed.ts                  # ✅ Phase 4
     ├── category-inventory-summary.ts  # ✅ Phase 4
-    └── ...
+    ├── order-history.ts               # ✅ Phase 5
+    ├── product-velocity.ts            # ✅ Phase 5
+    └── dead-stock.ts                  # ✅ Phase 5
 ```
 
 ## Related Packages

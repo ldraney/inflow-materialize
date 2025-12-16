@@ -18,6 +18,10 @@ import { vendorScorecardSQL } from './views/vendor-scorecard.js';
 import { productMarginSQL } from './views/product-margin.js';
 import { bomCostedSQL } from './views/bom-costed.js';
 import { categoryInventorySummarySQL } from './views/category-inventory-summary.js';
+// Phase 5: Time-Series / History
+import { orderHistorySQL } from './views/order-history.js';
+import { productVelocitySQL } from './views/product-velocity.js';
+import { deadStockSQL } from './views/dead-stock.js';
 /**
  * All view SQL statements
  */
@@ -42,6 +46,10 @@ export const allViewsSQL = [
     productMarginSQL,
     bomCostedSQL,
     categoryInventorySummarySQL,
+    // Phase 5: Time-Series / History
+    orderHistorySQL,
+    productVelocitySQL,
+    deadStockSQL,
 ];
 /**
  * View names for dropping/recreating
@@ -67,6 +75,10 @@ export const viewNames = [
     'product_margin',
     'bom_costed',
     'category_inventory_summary',
+    // Phase 5: Time-Series / History
+    'order_history',
+    'product_velocity',
+    'dead_stock',
 ];
 /**
  * Create all materialized views in the database
@@ -130,6 +142,13 @@ function getViewSQL(viewName) {
             return bomCostedSQL;
         case 'category_inventory_summary':
             return categoryInventorySummarySQL;
+        // Phase 5: Time-Series / History
+        case 'order_history':
+            return orderHistorySQL;
+        case 'product_velocity':
+            return productVelocitySQL;
+        case 'dead_stock':
+            return deadStockSQL;
     }
 }
 /**

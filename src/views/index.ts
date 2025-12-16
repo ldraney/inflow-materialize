@@ -82,6 +82,22 @@ export {
   categoryInventorySummarySQL,
 } from './category-inventory-summary.js';
 
+// Phase 5: Time-Series / History
+export {
+  orderHistory,
+  orderHistorySQL,
+} from './order-history.js';
+
+export {
+  productVelocity,
+  productVelocitySQL,
+} from './product-velocity.js';
+
+export {
+  deadStock,
+  deadStockSQL,
+} from './dead-stock.js';
+
 /**
  * All view SQL statements for creating views directly
  */

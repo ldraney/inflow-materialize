@@ -14,6 +14,9 @@ export { vendorScorecard, vendorScorecardSQL, } from './vendor-scorecard.js';
 export { productMargin, productMarginSQL, } from './product-margin.js';
 export { bomCosted, bomCostedSQL, } from './bom-costed.js';
 export { categoryInventorySummary, categoryInventorySummarySQL, } from './category-inventory-summary.js';
+export { orderHistory, orderHistorySQL, } from './order-history.js';
+export { productVelocity, productVelocitySQL, } from './product-velocity.js';
+export { deadStock, deadStockSQL, } from './dead-stock.js';
 /**
  * All view SQL statements for creating views directly
  */
