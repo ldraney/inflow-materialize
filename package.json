@@ -13,6 +13,10 @@
     "./views": {
       "import": "./dist/views/index.js",
       "types": "./dist/views/index.d.ts"
+    },
+    "./schemas": {
+      "import": "./dist/schemas/index.js",
+      "types": "./dist/schemas/index.d.ts"
     }
   },
   "files": [

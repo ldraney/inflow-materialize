@@ -22,5 +22,11 @@ export { createViews, dropViews, allViewsSQL, viewNames, } from './create-views.
 // Phase 1: Dashboard Layer
 export { productInventoryStatus, productInventoryStatusSQL, reorderAlerts, reorderAlertsSQL, openOrdersUnified, openOrdersUnifiedSQL, 
 // Phase 2: Operational Layer
-inventoryByLocation, inventoryByLocationSQL, locationStockSummary, locationStockSummarySQL, locationReorderAlerts, locationReorderAlertsSQL, transferPipeline, transferPipelineSQL, } from './views/index.js';
+inventoryByLocation, inventoryByLocationSQL, locationStockSummary, locationStockSummarySQL, locationReorderAlerts, locationReorderAlertsSQL, transferPipeline, transferPipelineSQL, 
+// Phase 3: Expert Layer
+inventoryDetail, inventoryDetailSQL, stockMovementLedger, stockMovementLedgerSQL, lotInventory, lotInventorySQL, serialInventory, serialInventorySQL, 
+// Phase 4: Business Analytics
+customer360, customer360SQL, vendorScorecard, vendorScorecardSQL, productMargin, productMarginSQL, bomCosted, bomCostedSQL, categoryInventorySummary, categoryInventorySummarySQL, 
+// Phase 5: Time-Series / History
+orderHistory, orderHistorySQL, productVelocity, productVelocitySQL, deadStock, deadStockSQL, } from './views/index.js';
 //# sourceMappingURL=index.js.map

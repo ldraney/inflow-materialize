@@ -87,19 +87,18 @@ Views that require historical data or time-based analysis.
 | `product_velocity` | Sales/consumption rate per product | ✅ Done |
 | `dead_stock` | Products with no movement in N days | ✅ Done |
 
-### Phase 6: Drizzle Schemas ⬜ TODO
+### Phase 6: Drizzle Schemas ✅ COMPLETE
 
-Type-safe schemas for downstream consumption. Enables typed queries in consuming apps.
+Type-safe schemas for downstream consumption. Views are defined with `sqliteView()` from drizzle-orm, providing full TypeScript types.
 
 | Task | Purpose | Status |
 |------|---------|--------|
-| Add `drizzle-orm` dependency | Required for schema definitions | ⬜ |
-| Create `src/schemas/` directory | Mirror view structure | ⬜ |
-| Schema for each view (18 total) | Type-safe table definitions | ⬜ |
-| Export schemas from package | `inflow-materialize/schemas` | ⬜ |
-| Update package.json exports | Subpath exports for schemas | ⬜ |
+| Add `drizzle-orm` dependency | Required for schema definitions | ✅ Done |
+| Views use `sqliteView()` | Built-in type-safe definitions | ✅ Done |
+| Export schemas from package | `inflow-materialize/schemas` | ✅ Done |
+| Update package.json exports | Subpath exports for schemas | ✅ Done |
 
-#### Downstream Usage (Goal)
+#### Downstream Usage
 
 ```typescript
 import { createViews } from 'inflow-materialize';
@@ -272,9 +271,8 @@ src/
 │   ├── order-history.ts               # Phase 5
 │   ├── product-velocity.ts            # Phase 5
 │   └── dead-stock.ts                  # Phase 5
-└── schemas/              # ⬜ Phase 6: Drizzle schemas (TODO)
-    ├── index.ts
-    └── ... (mirrors views/)
+└── schemas/              # ✅ Phase 6: Re-exports views for typed queries
+    └── index.ts          # Re-exports all views (no SQL strings)
 ```
 
 ## Related Packages
