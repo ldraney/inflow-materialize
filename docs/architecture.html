@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materialization-Centric Architecture</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --primary: #e94560;
+      --secondary: #0f3460;
+      --text: #eaeaea;
+      --muted: #a0a0a0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      color: var(--primary);
+      margin-top: 2rem;
+    }
+    .diagram {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .concept {
+      background: var(--secondary);
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.5rem;
+      margin: 1rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .concept strong {
+      color: var(--primary);
+    }
+    code {
+      background: var(--surface);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--secondary);
+    }
+    th {
+      color: var(--primary);
+      background: var(--surface);
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Materialization-Centric Architecture</h1>
+
+    <p>
+      In this architecture, <strong>materialized views are the central contract</strong>
+      between data sources and consumers. They define the business domain shape that
+      both frontends and write services agree on.
+    </p>
+
+    <h2>Core Insight</h2>
+
+    <div class="concept">
+      <strong>Materialization is where business logic lives.</strong><br>
+      Frontends and PUT services become dumb adapters that read/write view-shaped data.
+    </div>
+
+    <h2>System Overview</h2>
+
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart TB
+    subgraph Source ["Data Source"]
+        API[Inflow API]
+    end
+
+    subgraph Sync ["Sync Layer"]
+        GET[inflow-get<br/>Syncs API → SQLite]
+    end
+
+    subgraph Contract ["Contract Layer"]
+        MAT[inflow-materialize<br/>View Schemas]
+    end
+
+    subgraph Consumers ["Consumer Layer"]
+        FE[Frontends<br/>Read views, display data]
+        PUT[PUT Service<br/>View shape → API mutations]
+    end
+
+    API -->|polling/webhooks| GET
+    GET -->|raw tables| MAT
+    MAT -->|query| FE
+    MAT -->|schema defines shape| PUT
+    PUT -->|mutations| API
+
+    style MAT fill:#e94560,color:#fff
+    style Contract fill:#0f3460,color:#fff
+      </pre>
+    </div>
+
+    <h2>Data Flow</h2>
+
+    <div class="diagram">
+      <pre class="mermaid">
+sequenceDiagram
+    participant API as Inflow API
+    participant GET as inflow-get
+    participant DB as SQLite
+    participant MAT as Views
+    participant FE as Frontend
+    participant PUT as PUT Service
+
+    Note over GET,DB: Read Path
+    API->>GET: Fetch data
+    GET->>DB: Insert raw records
+    DB->>MAT: Materialize views
+    MAT->>FE: Query denormalized data
+
+    Note over PUT,API: Write Path
+    FE->>PUT: Submit view-shaped payload
+    PUT->>PUT: Map fields to API schema
+    PUT->>API: PATCH/POST entities
+    API-->>GET: Re-sync triggered
+      </pre>
+    </div>
+
+    <h2>Why Views as Contract?</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Concern</th>
+          <th>Traditional</th>
+          <th>View-Centric</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Business logic</td>
+          <td>Scattered across frontends</td>
+          <td>Centralized in view definitions</td>
+        </tr>
+        <tr>
+          <td>Adding a frontend</td>
+          <td>Reimplement joins/calculations</td>
+          <td>Query existing views</td>
+        </tr>
+        <tr>
+          <td>Changing calculation</td>
+          <td>Update every consumer</td>
+          <td>Update one view</td>
+        </tr>
+        <tr>
+          <td>Write service complexity</td>
+          <td>Knows business rules</td>
+          <td>Just field mapping</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Layer Responsibilities</h2>
+
+    <div class="diagram">
+      <pre class="mermaid">
+graph LR
+    subgraph "inflow-get"
+        A[Sync API data]
+        B[Store raw entities]
+    end
+
+    subgraph "inflow-materialize"
+        C[Join related tables]
+        D[Compute derived fields]
+        E[Define business status]
+        F[Expose stable schema]
+    end
+
+    subgraph "Frontends"
+        G[Query views]
+        H[Render UI]
+    end
+
+    subgraph "PUT Service"
+        I[Accept view-shaped input]
+        J[Map to API fields]
+        K[Call Inflow API]
+    end
+
+    A --> C
+    B --> C
+    C --> D --> E --> F
+    F --> G --> H
+    F --> I --> J --> K
+      </pre>
+    </div>
+
+    <h2>Example: Updating Reorder Point</h2>
+
+    <div class="diagram">
+      <pre class="mermaid">
+sequenceDiagram
+    participant User
+    participant FE as Frontend
+    participant PUT as PUT Service
+    participant Types as inflow-api-types
+    participant API as Inflow API
+
+    User->>FE: Change reorder point to 50
+    FE->>PUT: { productId: 123, reorderPoint: 50 }
+
+    Note over PUT,Types: PUT service knows mapping
+    PUT->>Types: Validate against Product schema
+    PUT->>API: PATCH /products/123<br/>{ reorderPoint: 50 }
+    API-->>PUT: 200 OK
+    PUT-->>FE: Success
+
+    Note over FE: View updates on next sync
+      </pre>
+    </div>
+
+    <h2>Key Packages</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Package</th>
+          <th>Role</th>
+          <th>Knows About</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>inflow-client</code></td>
+          <td>API communication</td>
+          <td>Auth, rate limits, endpoints</td>
+        </tr>
+        <tr>
+          <td><code>inflow-api-types</code></td>
+          <td>Schema validation</td>
+          <td>API request/response shapes</td>
+        </tr>
+        <tr>
+          <td><code>inflow-get</code></td>
+          <td>Sync to SQLite</td>
+          <td>Which entities to fetch, storage</td>
+        </tr>
+        <tr>
+          <td><code>inflow-materialize</code></td>
+          <td>Business views</td>
+          <td>Joins, calculations, domain logic</td>
+        </tr>
+        <tr>
+          <td><code>inflow-put</code> (future)</td>
+          <td>Write adapter</td>
+          <td>View→API field mapping only</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="concept">
+      <strong>The views are your domain model expressed as SQL.</strong><br>
+      Everything else is plumbing.
+    </div>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#e94560',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#0f3460',
+        lineColor: '#a0a0a0',
+        secondaryColor: '#0f3460',
+        tertiaryColor: '#16213e'
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "name": "inflow-materialize",
+  "version": "0.1.0",
+  "description": "Business-friendly materialized views for Inflow Inventory data",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./views": {
+      "import": "./dist/views/index.js",
+      "types": "./dist/views/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "inflow",
+    "inventory",
+    "sqlite",
+    "drizzle",
+    "views",
+    "materialized"
+  ],
+  "author": "ldraney",
+  "license": "ISC",
+  "peerDependencies": {
+    "inflow-get": ">=0.3.0"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.38.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "inflow-get": "^0.3.2",
+    "typescript": "^5.7.0"
+  }
+}
