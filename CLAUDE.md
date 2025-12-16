@@ -54,16 +54,16 @@ Location-aware views for inventory managers and warehouse operations.
 | `location_reorder_alerts` | Per-location reorder points (not just global) | ✅ Done |
 | `transfer_pipeline` | Open transfers between locations | ✅ Done |
 
-### Phase 3: Expert Layer 🔲 TODO
+### Phase 3: Expert Layer ✅ COMPLETE
 
 Full granularity for power users, compliance, and warehouse operations.
 
 | View | Purpose | Status |
 |------|---------|--------|
-| `inventory_detail` | inventoryLines + product/location names (sublocation, serial, lot) | 🔲 |
-| `stock_movement_ledger` | UNION of all stock movements (PO receipts, SO shipments, transfers, adjustments) | 🔲 |
-| `lot_inventory` | Lot-level tracking with product shelfLifeDays for expiry estimation | 🔲 |
-| `serial_inventory` | Serial number tracking with current location | 🔲 |
+| `inventory_detail` | inventoryLines + product/location names (sublocation, serial, lot) | ✅ Done |
+| `stock_movement_ledger` | UNION of all stock movements (PO receipts, SO shipments, transfers, adjustments) | ✅ Done |
+| `lot_inventory` | Lot-level tracking with product shelfLifeDays for expiry estimation | ✅ Done |
+| `serial_inventory` | Serial number tracking with current location | ✅ Done |
 
 ### Phase 4: Business Analytics 🔲 TODO
 
@@ -173,7 +173,10 @@ src/
     ├── location-stock-summary.ts      # ✅ Phase 2
     ├── location-reorder-alerts.ts     # ✅ Phase 2
     ├── transfer-pipeline.ts           # ✅ Phase 2
-    ├── inventory-detail.ts            # 🔲 Phase 3
+    ├── inventory-detail.ts            # ✅ Phase 3
+    ├── stock-movement-ledger.ts       # ✅ Phase 3
+    ├── lot-inventory.ts               # ✅ Phase 3
+    ├── serial-inventory.ts            # ✅ Phase 3
     └── ...
 ```
 
